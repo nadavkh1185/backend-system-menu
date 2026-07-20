@@ -1,98 +1,215 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Fullstack Menu Tree System - Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API for the **Fullstack Menu Tree System**, developed as part of the STK Fullstack Web Technical Test.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+The application provides a RESTful API for managing hierarchical menus with unlimited nesting levels using a self-referencing tree structure.
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Tech Stack
 
-## Project setup
+- NestJS
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- Swagger (OpenAPI)
+- class-validator
+- class-transformer
 
-```bash
-$ npm install
+---
+
+## Features
+
+- Create menu items
+- Retrieve menu tree structure
+- Retrieve a single menu item
+- Update menu items
+- Delete menu items (including descendant nodes)
+- Unlimited parent-child nesting
+- Request validation
+- Global error handling
+- Swagger API documentation
+
+---
+
+## Architecture
+
+The application follows a layered architecture:
+
+```
+Controller
+    │
+    ▼
+Service
+    │
+    ▼
+Prisma ORM
+    │
+    ▼
+PostgreSQL
 ```
 
-## Compile and run the project
+### Design Decisions
 
-```bash
-# development
-$ npm run start
+- Self-referencing database schema using `parentId`
+- Business logic isolated inside the service layer
+- DTO validation using `class-validator`
+- Recursive tree generation performed in the service layer
+- Clean separation between controllers, services, DTOs, and database access
 
-# watch mode
-$ npm run start:dev
+---
 
-# production mode
-$ npm run start:prod
+## Project Structure
+
+```
+src
+├── menus
+│   ├── dto
+│   │   ├── create-menu.dto.ts
+│   │   └── update-menu.dto.ts
+│   ├── menus.controller.ts
+│   ├── menus.service.ts
+│   └── menus.module.ts
+├── prisma
+├── app.module.ts
+└── main.ts
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ npm run test
+## Database Schema
 
-# e2e tests
-$ npm run test:e2e
+### Menu
 
-# test coverage
-$ npm run test:cov
+| Column    | Type            | Description           |
+| --------- | --------------- | --------------------- |
+| id        | UUID            | Primary key           |
+| name      | String          | Menu name             |
+| parentId  | UUID (nullable) | Parent menu reference |
+| createdAt | Timestamp       | Created timestamp     |
+| updatedAt | Timestamp       | Updated timestamp     |
+
+Relationship:
+
+```
+Menu
+ ├── Menu
+ │    ├── Menu
+ │    └── Menu
+ └── Menu
+      └── Menu
 ```
 
-## Deployment
+This structure supports unlimited nesting depth.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## API Endpoints
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+| Method | Endpoint         | Description                     |
+| ------ | ---------------- | ------------------------------- |
+| GET    | `/api/menus`     | Retrieve menu tree              |
+| GET    | `/api/menus/:id` | Retrieve menu by ID             |
+| POST   | `/api/menus`     | Create menu                     |
+| PUT    | `/api/menus/:id` | Update menu                     |
+| DELETE | `/api/menus/:id` | Delete menu and its descendants |
+
+---
+
+## API Documentation
+
+Swagger UI is available after the server starts:
+
+```
+http://localhost:3000/api/docs
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## Getting Started
 
-Check out a few resources that may come in handy when working with NestJS:
+### Prerequisites
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- Node.js 18+
+- npm
+- PostgreSQL
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Installation
 
-## Stay in touch
+```bash
+npm install
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
+
+### Environment Variables
+
+Create a `.env` file based on `.env.example`.
+
+Example:
+
+```env
+DATABASE_URL="postgresql://postgres:password@localhost:5432/menu_tree_db"
+PORT=3000
+```
+
+---
+
+### Database Migration
+
+```bash
+npx prisma migrate dev
+```
+
+Generate Prisma Client
+
+```bash
+npx prisma generate
+```
+
+---
+
+### Run Development Server
+
+```bash
+npm run start:dev
+```
+
+---
+
+### Production Build
+
+```bash
+npm run build
+npm run start:prod
+```
+
+---
+
+## Environment Example
+
+```
+DATABASE_URL=
+PORT=3000
+```
+
+---
+
+## Future Improvements
+
+The following features can be added in future iterations:
+
+- Drag and Drop menu reordering
+- Move menu to another parent
+- Menu ordering
+- Search and filtering
+- Docker & Docker Compose
+- Unit and Integration Tests
+
+---
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project was developed for the STK Fullstack Web Technical Test.
