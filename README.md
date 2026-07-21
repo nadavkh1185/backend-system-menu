@@ -120,9 +120,7 @@ This structure supports unlimited nesting depth.
 
 Swagger UI is available after the server starts:
 
-```
-http://localhost:3000/api/docs
-```
+http://localhost:8080/api/docs
 
 ---
 
