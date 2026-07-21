@@ -184,13 +184,33 @@ npm run build
 npm run start:prod
 ```
 
+## Run with Docker
+
+Build image
+
+```bash
+docker build -t stk-menu-backend .
+```
+
+Run container
+
+```bash
+docker run --env-file .env -p 8080:8080 stk-menu-backend
+```
+
+Swagger
+
+```
+http://localhost:8080/api/docs
 ---
 
 ## Environment Example
 
 ```
+
 DATABASE_URL=
 PORT=3000
+
 ```
 
 ---
@@ -211,3 +231,4 @@ The following features can be added in future iterations:
 ## License
 
 This project was developed for the STK Fullstack Web Technical Test.
+```
